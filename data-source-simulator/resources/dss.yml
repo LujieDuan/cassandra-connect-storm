@@ -1,0 +1,21 @@
+keysapce:
+  - name: k1
+    table:
+      - name: t1
+        column:
+          - c1: int
+          - c1
+          - c1
+          - c1
+          - c1
+          - c1
+          - c1
+          - c1
+        action:
+          - insert
+          - update
+          - delete
+      - name: t2
+        action:
+          - insert
+  - name: k2

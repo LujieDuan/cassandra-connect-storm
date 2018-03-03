@@ -1,8 +1,11 @@
 import java.io.{File, FileInputStream, InputStream, InputStreamReader}
+import java.util
 
 import KeySpaceActor.Start
 import akka.actor.{ActorSystem, Props}
 import org.yaml.snakeyaml.Yaml
+
+import collection.JavaConverters._
 
 /**
   *
@@ -15,10 +18,18 @@ object Main extends App {
   // Java Yaml Reader
   val filePath = if (args.length > 0) args(0) else DEFAULT_PATH
   val yaml = new Yaml()
-  val conf : java.util.LinkedHashMap[String, Object] = yaml.load(new FileInputStream(new File(filePath)))
+  val conf : java.util.LinkedHashMap[String, util.ArrayList[java.util.LinkedHashMap[String, Object]]] =
+    yaml.load(new FileInputStream(new File(filePath)))
+  var index = 0
 
-
-
-  val k1 = system.actorOf(Props[KeySpaceActor], "k1")
-  k1 ! Start
+  for (keyspace <- conf.get("keyspace").asScala) {
+    val name = keyspace.get("name")
+    val keySpaceActor = system.actorOf(Props(
+      new KeySpaceActor(keyspace.get("table")
+        .asInstanceOf[java.util.ArrayList[java.util.LinkedHashMap[String, Object]]],
+        name.asInstanceOf[String])),
+      s"KeySpaceActor-$index-$name")
+    index += 1
+    keySpaceActor ! Start
+  }
 }

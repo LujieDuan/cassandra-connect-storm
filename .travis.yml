@@ -1,0 +1,21 @@
+matrix:
+  include:
+    - language: scala
+      jdk: oraclejdk8
+      scala:
+        - 2.11.11
+      before_script: cd data-source-simulator
+      script:
+        - sbt ++$TRAVIS_SCALA_VERSION compile
+      after_script: cd ..
+    - language: scala
+      jdk: oraclejdk8
+      scala:
+        - 2.11.11
+      before_script: cd data-source-simulator
+      script:
+        - sbt ++$TRAVIS_SCALA_VERSION compile
+      after_script: cd ..
+      
+notifications:
+  email: false

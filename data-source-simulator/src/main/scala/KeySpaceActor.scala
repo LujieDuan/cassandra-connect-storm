@@ -1,8 +1,8 @@
 import KeySpaceActor.Start
+import TableActor.Initialize
 import akka.actor.{Actor, ActorLogging, Props}
 
 import collection.JavaConverters._
-import com.datastax.driver.core._
 import com.datastax.spark.connector.cql.CassandraConnector
 import org.apache.spark.SparkContext
 
@@ -17,28 +17,32 @@ class KeySpaceActor(keyspace : java.util.ArrayList[java.util.LinkedHashMap[Strin
 
   override def receive: Receive = {
     case Start => {
-      print("Start KeySpace")
+      log.info("Start KeySpace")
 
-      createKeySpace()
+      //createKeySpace()
 
       for (table <- keyspace.asScala) {
         val tableName = table.get("name")
         val columns = table.get("column")
-//        val tableActor = context.actorOf(Props(
-//          new TableActor(table.get.asInstanceOf[java.util.LinkedHashMap[String, Object]], tableName)),
-//          s"TableActor-$name-$index-$tableName")
-//        index += 1
-//        tableActor ! Start
+        val delay = table.getOrDefault("delay", 100.asInstanceOf[AnyRef])
+        val tableActor = context.actorOf(Props(
+          new TableActor(table.get("action")
+            .asInstanceOf[java.util.ArrayList[String]],
+            columns.asInstanceOf[java.util.ArrayList[String]],
+            name,
+            tableName.asInstanceOf[String],
+            delay.asInstanceOf[Int])),
+          s"TableActor-$name-$index-$tableName")
+        index += 1
+        tableActor ! Initialize
       }
     }
   }
 
   private def createKeySpace(): Unit = {
     CassandraConnector(sc.getConf).withSessionDo { session =>
-      session.execute("CREATE KEYSPACE IF NOT EXISTS test2 " +
+      session.execute(s"CREATE KEYSPACE IF NOT EXISTS $name " +
         "WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1 }")
-      session.execute("CREATE TABLE IF NOT EXISTS test2.words " +
-        "(word text PRIMARY KEY, count int)")
     }
   }
 }

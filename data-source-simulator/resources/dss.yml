@@ -7,13 +7,13 @@ keyspace:
         # The first column will be primary key, all columns are of type String
         column:
           - c1
-          - c1
-          - c1
-          - c1
-          - c1
-          - c1
-          - c1
-          - c1
+          - c2
+          - c3
+          - c4
+          - c5
+          - c6
+          - c7
+          - c8
         # Action can be insert, update, read and delete; all actions act randomly with a
         # delay; if want one action to happen more, then specify multiple times
         action:
@@ -23,35 +23,35 @@ keyspace:
           - read
           - delete
         # The delay in millisecond between each action; default 100
-        delay: 10000
+        delay: 100
       - name: t2
         column:
           - c1
-          - c1
-          - c1
+          - c2
+          - c3
         action:
           - insert
-        delay: 10000
+        delay: 100
   - name: k2
     table:
       - name: t1
         column:
           - c1
-          - c1
-          - c1
-          - c1
-          - c1
+          - c2
+          - c3
+          - c4
+          - c5
         action:
           - insert
           - update
           - read
           - delete
-        delay: 10000
+        delay: 100
       - name: t2
         column:
           - c1
-          - c1
-          - c1
+          - c2
+          - c3
         action:
           - insert
-        delay: 10000
+        delay: 100

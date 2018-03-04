@@ -26,7 +26,7 @@ class TableActor(actions : java.util.ArrayList[String],
   override def receive: Receive = {
     case Initialize => {
       log.info("Start Table Actor")
-      //createTable()
+      createTable()
 
       actionActors = actions.asScala.zipWithIndex.map(action => action._1 match {
         case "insert" => startInsertActor(action._2)
@@ -47,7 +47,7 @@ class TableActor(actions : java.util.ArrayList[String],
   private def createTable(): Unit = {
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(s"CREATE TABLE IF NOT EXISTS $keySpace.$name " +
-        s"(${columnListToString()}, PRIMARY KEY ${columns.get(0)})")
+        s"(${columnListToString()}, PRIMARY KEY (${columns.get(0)}))")
     }
   }
 

@@ -19,7 +19,7 @@ class KeySpaceActor(keyspace : java.util.ArrayList[java.util.LinkedHashMap[Strin
     case Start => {
       log.info("Start KeySpace")
 
-      //createKeySpace()
+      createKeySpace()
 
       for (table <- keyspace.asScala) {
         val tableName = table.get("name")

@@ -32,6 +32,8 @@ object Main extends App {
 
   implicit val sc : SparkContext = new SparkContext(conf)
 
+  sc.setLogLevel("ERROR")
+
   var index = 0
 
   for (keyspace <- requirements.get("keyspace").asScala) {

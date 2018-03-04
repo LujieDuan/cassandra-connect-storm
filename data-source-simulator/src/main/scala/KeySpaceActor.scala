@@ -1,13 +1,17 @@
 import KeySpaceActor.Start
 import akka.actor.{Actor, ActorLogging, Props}
+
 import collection.JavaConverters._
+import com.datastax.driver.core._
+import com.datastax.spark.connector.cql.CassandraConnector
+import org.apache.spark.SparkContext
 
 object KeySpaceActor {
   case object Start
 }
 
 class KeySpaceActor(keyspace : java.util.ArrayList[java.util.LinkedHashMap[String, Object]], name : String)
-  extends Actor with ActorLogging {
+                   (implicit sc: SparkContext) extends Actor with ActorLogging {
 
   var index = 0
 
@@ -30,7 +34,12 @@ class KeySpaceActor(keyspace : java.util.ArrayList[java.util.LinkedHashMap[Strin
   }
 
   private def createKeySpace(): Unit = {
-    
+    CassandraConnector(sc.getConf).withSessionDo { session =>
+      session.execute("CREATE KEYSPACE IF NOT EXISTS test2 " +
+        "WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1 }")
+      session.execute("CREATE TABLE IF NOT EXISTS test2.words " +
+        "(word text PRIMARY KEY, count int)")
+    }
   }
 }
 

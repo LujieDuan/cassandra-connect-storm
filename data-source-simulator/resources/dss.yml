@@ -17,6 +17,30 @@ keyspace:
           - read
           - delete
       - name: t2
+        column:
+          - c1
+          - c1
+          - c1
         action:
           - insert
   - name: k2
+    table:
+      - name: t1
+        column:
+          - c1
+          - c1
+          - c1
+          - c1
+          - c1
+        action:
+          - insert
+          - update
+          - read
+          - delete
+      - name: t2
+        column:
+          - c1
+          - c1
+          - c1
+        action:
+          - insert

@@ -1,0 +1,47 @@
+version: '3'
+
+
+
+services:
+  # Cluster compose from: https://github.com/calvinlfer/compose-cassandra-cluster
+  ##########################################################################################################
+  # 3 node cluster
+  # If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
+  cassandra-seed:
+    container_name: cassandra-seed-node
+    image: cassandra
+    ports:
+      - "9042:9042"   # Native transport, CQL
+      - "7199:7199"   # JMX
+      - "9160:9160"   # Thrift clients
+  #    - "7000:7000"   # Intra-node communication
+  #    - "7001:7001"   # TLS intra-node communication
+  #  restart: always
+
+  # cassandra-node-1:
+  #   container_name: cassandra-node-1
+  #   image: cassandra
+  #   command: /bin/bash -c "echo 'Waiting for seed node' && sleep 30 && /docker-entrypoint.sh cassandra -f"
+  #   environment:
+  #     - "CASSANDRA_SEEDS=cassandra-seed-node"
+  #   depends_on:
+  #     - "cassandra-seed"
+  #  restart: always
+
+  # you cannot have multiple nodes join the cluster at the same time when
+  # cassandra.consistent.rangemovement is true so we further delay it to give it time to stabilize
+  # cassandra-node-2:
+  #   container_name: cassandra-node-2
+  #   image: cassandra
+  #   command: /bin/bash -c "echo 'Waiting for seed node' && sleep 80 && /docker-entrypoint.sh cassandra -f"
+  #   environment:
+  #     - "CASSANDRA_SEEDS=cassandra-seed-node"
+  #   depends_on:
+  #     - "cassandra-seed"
+  #  restart: always
+  ##########################################################################################################
+
+  # cassandra-cql:
+  #   container_name: cassandra-cql
+  #   image: cassandra
+

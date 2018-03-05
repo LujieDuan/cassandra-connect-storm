@@ -19,6 +19,8 @@ keyspace:
         action:
           - insert
           - insert
+          - insert
+          - insert
           - update
           - read
           - delete
@@ -30,6 +32,8 @@ keyspace:
           - c2
           - c3
         action:
+          - insert
+          - insert
           - insert
         delay: 100
   - name: k2
@@ -43,6 +47,8 @@ keyspace:
           - c5
         action:
           - insert
+          - insert
+          - insert
           - update
           - read
           - delete
@@ -53,5 +59,8 @@ keyspace:
           - c2
           - c3
         action:
+          - insert
+          - insert
+          - insert
           - insert
         delay: 100

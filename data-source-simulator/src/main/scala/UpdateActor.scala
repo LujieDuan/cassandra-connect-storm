@@ -27,7 +27,8 @@ class UpdateActor(columns : java.util.ArrayList[String],
     val id = if (rdd.count() > 0) rdd.first().getString(0) else UUID.randomUUID().toString
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(s"UPDATE $keySpaceName.$tableName " +
-        s"SET ${columnListToNewRecord()} " +
+        s"SET ${columnListToNewRecord()}, " +
+        s"last_modified = toTimestamp(now())" +
         s"WHERE ${columns.get(0)} = '$id'")
     }
   }

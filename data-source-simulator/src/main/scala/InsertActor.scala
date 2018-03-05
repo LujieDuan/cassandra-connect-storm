@@ -27,8 +27,8 @@ class InsertActor(columns : java.util.ArrayList[String],
   private def insertOne(): Unit = {
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(s"INSERT INTO $keySpaceName.$tableName " +
-        s"(${columnListToString()})" +
-        s"VALUES (${generateRecord()})")
+        s"(${columnListToString()}, last_modified)" +
+        s"VALUES (${generateRecord()}, toTimestamp(now()))")
     }
   }
 

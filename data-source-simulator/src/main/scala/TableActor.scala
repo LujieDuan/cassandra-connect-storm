@@ -47,7 +47,7 @@ class TableActor(actions : java.util.ArrayList[String],
   private def createTable(): Unit = {
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(s"CREATE TABLE IF NOT EXISTS $keySpace.$name " +
-        s"(${columnListToString()}, PRIMARY KEY (${columns.get(0)}))")
+        s"(${columnListToString()}, last_modified TIMESTAMP, PRIMARY KEY (${columns.get(0)}))")
     }
   }
 

@@ -41,7 +41,85 @@ services:
   #  restart: always
   ##########################################################################################################
 
+  # If you need an extra cassandra node to run cqlsh to the cassandra-seed-node
   # cassandra-cql:
   #   container_name: cassandra-cql
   #   image: cassandra
+  #   depends_on:
+  #     - "cassandra-seed"
+
+  ##########################################################################################################
+  # For the storm-cassandra-pulling 
+  zookeeper:
+    image: zookeeper
+    container_name: zookeeper
+    restart: always
+
+  nimbus:
+    image: storm
+    container_name: nimbus
+    command: storm nimbus
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper
+    restart: always
+    ports:
+      - 6627:6627
+    volumes:
+      - ./target:/code
+      - ./src/main/resources:/resources
+
+  supervisor:
+    image: storm
+    container_name: supervisor
+    command: storm supervisor
+    depends_on:
+      - nimbus
+      - zookeeper
+    links:
+      - nimbus
+      - zookeeper
+    restart: always
+    ports:
+      - 8000:8000
+      - 8001:6700
+    volumes:
+      - ./src/main/resources:/resources
+
+  stormui:
+    image: storm
+    container_name: ui
+    command: storm ui
+    depends_on:
+      - nimbus
+      - zookeeper
+    links:
+      - nimbus
+      - zookeeper
+    restart: always
+    ports:
+      - 8088:8080
+
+  redisdb:
+    image: redis
+    container_name: redisdb
+    depends_on:
+      - nimbus
+      - zookeeper
+      - supervisor
+    restart: always
+
+  redis-browser:
+    image: birkof/redis-browser
+    container_name: redis-browser
+    command: --url redis://redisdb:6379 -b 0.0.0.0
+    depends_on:
+      - redisdb
+    restart: always
+    ports:
+      - 4567:4567
+
+
+
 

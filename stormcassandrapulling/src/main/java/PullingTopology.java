@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import redis.RedisClient;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class PullingTopology {
 
@@ -24,7 +24,7 @@ public class PullingTopology {
         builder.setSpout("source", new SourceSpout(), 10);
         builder.setBolt("tag-process", new TimestampBolt(), 4).shuffleGrouping("source", "Tag");
 
-        String seedTimestamp = new Timestamp(0).toString();
+        String seedTimestamp = new Date(0).toString();
 
         this.pool = new RedisClient().pool;
         Jedis jedis = pool.getResource();

@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPool;
 import java.util.Map;
 
 public class TimestampBolt extends BaseRichBolt {
-    private static final Logger LOG = LoggerFactory.getLogger(TumblrTagsBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimestampBolt.class);
     private final String TAGS_VARIABLE_NAME = "tags";
     JedisPool pool;
     Jedis jedis;

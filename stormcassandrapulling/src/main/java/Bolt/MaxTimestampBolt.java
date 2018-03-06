@@ -15,9 +15,10 @@ import java.util.Date;
 import java.util.Map;
 
 import static Spout.SourceSpout.TASKS_VARIABLE_NAME;
+import static Spout.SourceSpout.timestampFormat;
 
-public class TimestampBolt extends BaseRichBolt {
-    private static final Logger LOG = LoggerFactory.getLogger(TimestampBolt.class);
+public class MaxTimestampBolt extends BaseRichBolt {
+    private static final Logger LOG = LoggerFactory.getLogger(MaxTimestampBolt.class);
     JedisPool pool;
     Jedis jedis;
     OutputCollector _collector;
@@ -37,11 +38,10 @@ public class TimestampBolt extends BaseRichBolt {
 
         Date timestamp = (Date) tuple.getValue(1);
 
-        LOG.debug("Submit Tags: {}", tableName);
+        String timestampString = timestampFormat.format(timestamp);
 
-        //jedis.lpush(TASKS_VARIABLE_NAME, tableName);
-        // _collector.emit(new Values(tag));
-
+        LOG.debug("Submit Tasks: {} - {}", tableName, timestampString);
+        jedis.lpush(TASKS_VARIABLE_NAME, String.format("%s|%s", tableName, timestampString));
     }
 
     @Override

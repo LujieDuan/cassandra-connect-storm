@@ -13,7 +13,7 @@ import collection.JavaConverters._
   */
 object Main extends App {
 
-  val DEFAULT_PATH = "resources/dss.yml"
+  val DEFAULT_PATH = "/resources/dss.yml"
   val system = ActorSystem("data-source-simulator")
 
   // Java Yaml Reader
@@ -24,7 +24,7 @@ object Main extends App {
 
   // Spark
   val conf = new SparkConf(true)
-    .set("spark.cassandra.connection.host", "localhost")
+    .set("spark.cassandra.connection.host", "cassandra-seed-node")
     .set("spark.cassandra.auth.username", "cassandra")
     .set("spark.cassandra.auth.password", "cassandra")
     .setAppName("Data-Source-Simulator")

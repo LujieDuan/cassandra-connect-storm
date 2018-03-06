@@ -14,8 +14,9 @@ import org.slf4j.LoggerFactory;
 import redis.RedisClient;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -28,7 +29,8 @@ public class SourceSpout extends BaseRichSpout{
     SpoutOutputCollector _collector;
     Random _rand;
 
-    private String TAGS_VARIABLE_NAME = "tasks";
+    static public String TASKS_VARIABLE_NAME = "tasks";
+    static public SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
     private String TIMESTAMP_COLUMN = "last_modified";
     private String QUERY_LIMIT = "100";
 
@@ -43,12 +45,15 @@ public class SourceSpout extends BaseRichSpout{
 
     @Override
     public void nextTuple() {
-        String[] currentTask = jedis.brpop(0, TAGS_VARIABLE_NAME).get(0).split("|");
+        String[] currentTask = jedis.brpop(0, TASKS_VARIABLE_NAME).get(1).split("[|]");
 
         String tableName = currentTask[0];
         String timestamp = currentTask[1];
 
-        ResultSet newRecords = CClinet.execute(String.format("SELECT FROM %s WHERE %s > '%s' LIMIT %s",
+        LOG.warn(String.format("SELECT * FROM %s WHERE %s > '%s' LIMIT %s",
+                tableName, TIMESTAMP_COLUMN, timestamp, QUERY_LIMIT));
+
+        ResultSet newRecords = CClinet.execute(String.format("SELECT * FROM %s WHERE %s > '%s' LIMIT %s ALLOW FILTERING",
                 tableName, TIMESTAMP_COLUMN, timestamp, QUERY_LIMIT));
 
         Date max = new Date(0);

@@ -16,8 +16,8 @@ import java.util.Map;
 
 import static Spout.SourceSpout.TASKS_VARIABLE_NAME;
 
-public class TimestampBolt extends BaseRichBolt {
-    private static final Logger LOG = LoggerFactory.getLogger(TimestampBolt.class);
+public class RecordBolt extends BaseRichBolt {
+    private static final Logger LOG = LoggerFactory.getLogger(RecordBolt.class);
     JedisPool pool;
     Jedis jedis;
     OutputCollector _collector;
@@ -35,9 +35,9 @@ public class TimestampBolt extends BaseRichBolt {
     {
         String tableName = tuple.getString(0);
 
-        Date timestamp = (Date) tuple.getValue(1);
+        String record = tuple.getString(1);
 
-        LOG.debug("Submit Tags: {}", tableName);
+        LOG.debug("Submit Record: {} - {}", tableName, record);
 
         //jedis.lpush(TASKS_VARIABLE_NAME, tableName);
         // _collector.emit(new Values(tag));

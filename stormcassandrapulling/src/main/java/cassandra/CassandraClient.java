@@ -11,30 +11,42 @@ public class CassandraClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(CassandraClient.class);
 
-    Cluster cluster;
-    Session session;
+    private Cluster cluster;
+    private Session session;
 
     public CassandraClient() {
-        try {
-            cluster = Cluster.builder()
-                    .addContactPoint("127.0.0.1")
-                    .build();
-            Session session = cluster.connect();
+//        try {
+//            cluster = Cluster.builder()
+//                    .addContactPoint("cassandra-seed-node")
+//                    .withCredentials("cassandra", "cassandra")
+//                    .build();
+//            session = cluster.connect();
+//
+//            ResultSet rs = session.execute("select release_version from system.local");
+//            Row row = rs.one();
+//            LOG.debug("Connected to Cassandra with version = " + row.getString("release_version"));
+//        } finally {
+//            if (cluster != null) cluster.close();
+//        }
+        cluster = Cluster.builder()
+                .addContactPoint("cassandra-seed-node")
+                .withCredentials("cassandra", "cassandra")
+                .build();
+        session = cluster.connect();
 
-            ResultSet rs = session.execute("select release_version from system.local");
-            Row row = rs.one();
-            LOG.debug("Connected to Cassandra with version = " + row.getString("release_version"));
-        } finally {
-            if (cluster != null) cluster.close();
-        }
+        ResultSet rs = session.execute("select release_version from system.local");
+        Row row = rs.one();
+        LOG.debug("Connected to Cassandra with version = " + row.getString("release_version"));
     }
 
     public ResultSet execute(String query) {
-        try {
-            return session.execute("select release_version from system.local");
-        } finally {
-            if (cluster != null) cluster.close();
-        }
+//        try {
+//            return session.execute(query);
+//        } finally {
+//            if (cluster != null) cluster.close();
+//        }
+        return session.execute(query);
+
     }
 
 

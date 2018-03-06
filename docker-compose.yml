@@ -7,7 +7,7 @@ services:
   ##########################################################################################################
   # 3 node cluster
   # If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
-  cassandra-seed:
+  cassandra-seed-node:
     container_name: cassandra-seed-node
     image: cassandra
     ports:
@@ -67,8 +67,8 @@ services:
     ports:
       - 6627:6627
     volumes:
-      - ./target:/code
-      - ./src/main/resources:/resources
+      - ./stormcassandrapulling/target:/code
+      - ./stormcassandrapulling/src/main/resources:/resources
 
   supervisor:
     image: storm
@@ -85,7 +85,7 @@ services:
       - 8000:8000
       - 8001:6700
     volumes:
-      - ./src/main/resources:/resources
+      - ./stormcassandrapulling/src/main/resources:/resources
 
   stormui:
     image: storm
@@ -120,6 +120,16 @@ services:
     ports:
       - 4567:4567
 
-
+  openjdk:
+    image: openjdk
+    container_name: openjdk
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 100 && java -jar /data-source-simulator/data-source-simulator-assembly-0.1.jar"
+    depends_on:
+      - cassandra-seed-node
+      - redisdb
+    restart: always
+    volumes:
+      - ./data-source-simulator/target/scala-2.11:/data-source-simulator
+      - ./data-source-simulator/resources/dss.yml:/resources/dss.yml
 
 

@@ -2,11 +2,7 @@ import org.apache.storm.Config;
 import org.apache.storm.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import util.StormRunner;
-
-import java.io.IOException;
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -17,8 +13,6 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         TopologyBuilder builder = new TopologyBuilder();
-
-
 
         // Build individual component
         new PullingTopology(builder).build();

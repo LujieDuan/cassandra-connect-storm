@@ -39,9 +39,10 @@ public class MaxTimestampBolt extends BaseRichBolt {
         Date timestamp = (Date) tuple.getValue(1);
 
         String timestampString = timestampFormat.format(timestamp);
+        Long timestampLong = timestamp.getTime();
 
         LOG.debug("Submit Tasks: {} - {}", tableName, timestampString);
-        jedis.lpush(TASKS_VARIABLE_NAME, String.format("%s|%s", tableName, timestampString));
+        jedis.lpush(TASKS_VARIABLE_NAME, String.format("%s|%s|%s", tableName, timestampLong, timestampString));
     }
 
     @Override

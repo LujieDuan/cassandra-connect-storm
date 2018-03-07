@@ -56,9 +56,11 @@ public class SourceSpout extends BaseRichSpout{
         ResultSet newRecords = CClinet.execute(String.format("SELECT * FROM %s WHERE %s > '%s' LIMIT %s ALLOW FILTERING",
                 tableName, TIMESTAMP_COLUMN, timestamp, QUERY_LIMIT));
 
-        Date max = new Date(0);
+        Date max = new Date(Long.parseLong(timestamp));
+        Boolean hasRecord = false;
 
         for (Row r : newRecords) {
+            hasRecord = true;
             Date t = r.getTimestamp(TIMESTAMP_COLUMN);
             if (t.after(max)) max = t;
             _collector.emit("Timestamp", new Values(tableName, t));
@@ -71,8 +73,11 @@ public class SourceSpout extends BaseRichSpout{
             _collector.emit("Record", new Values(tableName, sb.toString()));
             LOG.debug("Emitting Record: {} - {}", tableName, sb.toString());
         }
+
         _collector.emit("MaxTimestamp", new Values(tableName, max));
         LOG.debug("Emitting MaxTimestamp: {} - {}", tableName, max);
+
+        //TODO if not emit max - can delay next task
     }
     @Override
     public void ack(Object id) {

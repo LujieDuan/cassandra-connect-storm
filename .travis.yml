@@ -1,14 +1,24 @@
 matrix:
   include:
+    # data-source-simulator
     - language: scala
       jdk: oraclejdk8
       before_script: cd data-source-simulator
       script:
         - sbt compile
       after_script: cd ..
+    # storm-cassandra-pulling
     - language: java
       jdk: oraclejdk8
       before_script: cd stormcassandrapulling 
+      script:
+        - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        - mvn test -B
+      after_script: cd ..
+    # kafka-cdc-handler
+    - language: java
+      jdk: oraclejdk8
+      before_script: cd kafkacdchandler 
       script:
         - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
         - mvn test -B

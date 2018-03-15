@@ -28,7 +28,8 @@ class UpdateActor(columns : java.util.ArrayList[String],
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(s"UPDATE $keySpaceName.$tableName " +
         s"SET ${columnListToNewRecord()}, " +
-        s"last_modified = toTimestamp(now())" +
+        s"last_modified = toTimestamp(now()), " +
+        s"last_modified_uuid = now()" +
         s"WHERE ${columns.get(0)} = '$id'")
     }
   }

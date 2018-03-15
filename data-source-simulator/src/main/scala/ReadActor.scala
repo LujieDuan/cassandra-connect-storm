@@ -22,6 +22,7 @@ class ReadActor(column : java.util.ArrayList[String],
   private def readOne(): Unit = {
     val rdd = sc.cassandraTable(keySpaceName, tableName).limit(1)
     val id = if (rdd.count() > 0) rdd.first().getString(0) else UUID.randomUUID().toString
+    log.info(s"Read record with id $id")
   }
 }
 

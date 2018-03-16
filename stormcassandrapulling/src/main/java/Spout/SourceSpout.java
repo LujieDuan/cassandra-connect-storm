@@ -3,6 +3,7 @@ package Spout;
 import cassandra.CassandraClient;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.utils.UUIDs;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 public class SourceSpout extends BaseRichSpout{
     private static final Logger LOG = LoggerFactory.getLogger(SourceSpout.class);
@@ -31,8 +33,8 @@ public class SourceSpout extends BaseRichSpout{
 
     static public String TASKS_VARIABLE_NAME = "tasks";
     static public SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-    private String TIMESTAMP_COLUMN = "last_modified";
-    private String QUERY_LIMIT = "100";
+    static public String TIMESTAMP_COLUMN = "last_modified_uuid";
+    static public String PRIMARY_KEY_COLUMN = "last_modified_uuid";
 
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
@@ -50,28 +52,31 @@ public class SourceSpout extends BaseRichSpout{
         String tableName = currentTask[0];
         String timestamp = currentTask[1];
 
-        LOG.warn(String.format("SELECT * FROM %s WHERE %s > '%s' LIMIT %s",
-                tableName, TIMESTAMP_COLUMN, timestamp, QUERY_LIMIT));
+        String query = String.format("SELECT * FROM %s " +
+                        "WHERE %s > %s ALLOW FILTERING",
+                tableName, TIMESTAMP_COLUMN, UUIDs.startOf(Long.parseLong(timestamp)));
 
-        ResultSet newRecords = CClinet.execute(String.format("SELECT * FROM %s WHERE %s > '%s' LIMIT %s ALLOW FILTERING",
-                tableName, TIMESTAMP_COLUMN, timestamp, QUERY_LIMIT));
+        LOG.warn(query);
+
+        ResultSet newRecords = CClinet.execute(query);
 
         Date max = new Date(Long.parseLong(timestamp));
         Boolean hasRecord = false;
 
         for (Row r : newRecords) {
             hasRecord = true;
-            Date t = r.getTimestamp(TIMESTAMP_COLUMN);
+            Date t = new Date(UUIDs.unixTimestamp(r.getUUID(TIMESTAMP_COLUMN)));
+            UUID k = r.getUUID(PRIMARY_KEY_COLUMN);
             if (t.after(max)) max = t;
             _collector.emit("Timestamp", new Values(tableName, t));
             LOG.debug("Emitting Timestamp: {} - {}", tableName, t);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < r.getColumnDefinitions().size() - 1; i ++) {
-                sb.append(r.getString(i));
+                sb.append(r.getObject(i).toString());
             }
-            _collector.emit("Record", new Values(tableName, sb.toString()));
-            LOG.debug("Emitting Record: {} - {}", tableName, sb.toString());
+            _collector.emit("Record", new Values(tableName, sb.toString(), k.toString()));
+            LOG.debug("Emitting Record: {} - {}", tableName, sb.toString(), k.toString());
         }
 
         _collector.emit("MaxTimestamp", new Values(tableName, max));
@@ -95,7 +100,7 @@ public class SourceSpout extends BaseRichSpout{
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("Record", new Fields("Table", "Record"));
+        declarer.declareStream("Record", new Fields("Table", "Record", "Key"));
         declarer.declareStream("Timestamp", new Fields("Table", "Timestamp"));
         declarer.declareStream("MaxTimestamp", new Fields("Table", "MaxTimestamp"));
     }

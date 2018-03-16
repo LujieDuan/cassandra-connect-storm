@@ -4,25 +4,22 @@ import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.RedisClient;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.util.Date;
 import java.util.Map;
 
-import static Spout.SourceSpout.TASKS_VARIABLE_NAME;
-
-public class RecordBolt extends BaseRichBolt {
-    private static final Logger LOG = LoggerFactory.getLogger(RecordBolt.class);
+public class RecordCheckBolt extends BaseRichBolt {
+    private static final Logger LOG = LoggerFactory.getLogger(RecordCheckBolt.class);
     JedisPool pool;
     Jedis jedis;
     OutputCollector _collector;
-
-    public static final String COUNTER_PREFIX = "counter-";
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
@@ -36,14 +33,15 @@ public class RecordBolt extends BaseRichBolt {
     public void execute(Tuple tuple)
     {
         String tableName = tuple.getString(0);
-
         String record = tuple.getString(1);
+        String primaryKey = tuple.getString(2);
 
-        LOG.debug("Submit Record: {} - {}", tableName, record);
+        LOG.debug("Check Record: {} - {}", tableName, primaryKey);
 
-        jedis.incr(COUNTER_PREFIX + tableName);
-        // _collector.emit(new Values(tag));
-
+        if (!jedis.sismember(tableName, primaryKey)) {
+            jedis.sadd(tableName, primaryKey);
+            _collector.emit(new Values(tableName, record));
+        }
     }
 
     @Override
@@ -56,7 +54,6 @@ public class RecordBolt extends BaseRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
-        // Final Bolt
-        // declarer.declare(new Fields("Tag"));
+        declarer.declare(new Fields("Table", "Record"));
     }
 }

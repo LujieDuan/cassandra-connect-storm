@@ -1,5 +1,6 @@
 import Bolt.MaxTimestampBolt;
 import Bolt.RecordBolt;
+import Bolt.RecordCheckBolt;
 import Bolt.TimestampBolt;
 import Spout.SourceSpout;
 import cassandra.CassandraClient;
@@ -30,12 +31,16 @@ public class PullingTopology {
 
     public void build() {
         builder.setSpout("source", new SourceSpout(), 10);
+
         builder.setBolt("timestamp-process", new TimestampBolt(), 4)
                 .shuffleGrouping("source", "Timestamp");
         builder.setBolt("max-timestamp-process", new MaxTimestampBolt(), 4)
                 .shuffleGrouping("source", "MaxTimestamp");
-        builder.setBolt("record-process", new RecordBolt(), 4)
+        builder.setBolt("record-check", new RecordCheckBolt(), 4)
                 .shuffleGrouping("source", "Record");
+
+        builder.setBolt("record-process", new RecordBolt(), 4)
+                .shuffleGrouping("record-check");
 
         String seedTimestamp = timestampFormat.format(new Date(0));
 

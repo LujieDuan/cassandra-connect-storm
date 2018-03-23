@@ -58,14 +58,14 @@ services:
   nimbus:
     image: storm
     container_name: nimbus
-    command: storm nimbus
+    command: bash -c "(storm logviewer -c logviewer.port='8002' &) && (storm nimbus -c logviewer.port='8002')"
     depends_on:
       - zookeeper
     links:
       - zookeeper
     restart: always
     ports:
-      - 6627:6627
+      - 8002:8002
     volumes:
       - ./stormcassandrapulling/target:/code
       - ./stormcassandrapulling/src/main/resources:/resources
@@ -73,7 +73,7 @@ services:
   supervisor:
     image: storm
     container_name: supervisor
-    command: storm supervisor
+    command: bash -c "(storm logviewer -c logviewer.port='8003' &) && (storm supervisor -c logviewer.port='8003')"
     depends_on:
       - nimbus
       - zookeeper
@@ -82,14 +82,13 @@ services:
       - zookeeper
     restart: always
     ports:
-      - 8000:8000
-      - 8001:6700
+      - 8003:8003
     volumes:
       - ./stormcassandrapulling/src/main/resources:/resources
 
   stormui:
     image: storm
-    container_name: ui
+    container_name: stormmui
     command: storm ui
     depends_on:
       - nimbus
@@ -120,9 +119,9 @@ services:
     ports:
       - 4567:4567
 
-  openjdk:
+  datasource:
     image: openjdk
-    container_name: openjdk
+    container_name: datasource
     command: /bin/bash -c "echo 'Waiting for seed node' && sleep 100 && java -jar /data-source-simulator/data-source-simulator-assembly-0.1.jar"
     depends_on:
       - cassandra-seed-node

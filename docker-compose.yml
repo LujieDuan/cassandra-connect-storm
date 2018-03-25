@@ -10,6 +10,13 @@ services:
   cassandra-seed-node:
     container_name: cassandra-seed-node
     image: cassandra
+    volumes:
+      - ./cassandra.yaml:/tmp/custom_cassandra/cassandra.yaml
+    environment:
+      - "JVM_EXTRA_OPTS=-Dcassandra.config=/tmp/custom_cassandra/cassandra.yaml"
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
     ports:
       - "9042:9042"   # Native transport, CQL
       - "7199:7199"   # JMX
@@ -131,4 +138,11 @@ services:
       - ./data-source-simulator/target/scala-2.11:/data-source-simulator
       - ./data-source-simulator/resources/dss.yml:/resources/dss.yml
 
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.1/16
 

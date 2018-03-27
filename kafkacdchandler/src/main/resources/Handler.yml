@@ -1,0 +1,11 @@
+cassandra:
+  keyspace: k1
+  table: t2
+  cdc_raw_directory: /var/lib/cassandra/cdc_raw
+#  cdc_raw_directory: /Users/LD/programming/cassandra-connect-storm/cdc_raw/cdc_raw
+kafka:
+  topic: cdc-topic
+  configuration:
+    bootstrap.servers: kafka:9092
+    key.serializer: org.apache.kafka.common.serialization.StringSerializer
+    value.serializer: org.apache.kafka.common.serialization.StringSerializer

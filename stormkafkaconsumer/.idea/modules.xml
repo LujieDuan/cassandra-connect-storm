@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/kafka-cdc-handler.iml" filepath="$PROJECT_DIR$/kafka-cdc-handler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stormkafkaconsumer.iml" filepath="$PROJECT_DIR$/stormkafkaconsumer.iml" />
     </modules>
   </component>
 </project>

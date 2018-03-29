@@ -6,12 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="kafka-cdc-handler" />
+        <module name="stormkafkaconsumer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="kafka-cdc-handler" target="1.7" />
-      <module name="kafkacdchandler" target="1.7" />
+      <module name="stormkafkaconsumer" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

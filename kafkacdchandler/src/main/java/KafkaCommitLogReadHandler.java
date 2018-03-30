@@ -31,14 +31,10 @@ public class KafkaCommitLogReadHandler implements CommitLogReadHandler{
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaCommitLogReadHandler.class);
 
-    private final String keyspace;
-    private final String table;
     private final String topic;
     private final Producer<String, String> producer;
 
     public KafkaCommitLogReadHandler(Map<String, Object> configuration) {
-        keyspace = (String) YamlUtils.select(configuration, "cassandra.keyspace");
-        table = (String) YamlUtils.select(configuration, "cassandra.table");
         topic = (String) YamlUtils.select(configuration, "kafka.topic");
         producer = new KafkaProducer<>((Map) YamlUtils.select(configuration, "kafka.configuration"));
     }
@@ -90,16 +86,13 @@ public class KafkaCommitLogReadHandler implements CommitLogReadHandler{
     @SuppressWarnings("unchecked")
     private void process(Partition partition) {
         LOG.debug("Process method started...");
-        if (!partition.metadata().ksName.equals(keyspace)) {
-            LOG.debug("Keyspace should be '{}' but is '{}'.", keyspace, partition.metadata().ksName);
-            return;
-        }
-        if (!partition.metadata().cfName.equals(table)) {
-            LOG.debug("Table should be '{} but is '{}'.", table, partition.metadata().cfName);
-            return;
-        }
+
+        String keyspace = partition.metadata().ksName;
+        String tableName = partition.metadata().cfName;
         String key = getKey(partition);
         JSONObject obj = new JSONObject();
+        obj.put("keyspace", keyspace);
+        obj.put("table", tableName);
         obj.put("key", key);
         if (partitionIsDeleted(partition)) {
             obj.put("partitionDeleted", true);
@@ -148,11 +141,11 @@ public class KafkaCommitLogReadHandler implements CommitLogReadHandler{
                         if (i == bound.size() - 1) {
                             if (bound.kind().isStart()) {
                                 boundObject.put("inclusive",
-                                        bound.kind() == ClusteringPrefix.Kind.INCL_START_BOUND ? true : false);
+                                        bound.kind() == ClusteringPrefix.Kind.INCL_START_BOUND);
                             }
                             if (bound.kind().isEnd()) {
                                 boundObject.put("inclusive",
-                                        bound.kind() == ClusteringPrefix.Kind.INCL_END_BOUND ? true : false);
+                                        bound.kind() == ClusteringPrefix.Kind.INCL_END_BOUND);
                             }
                         }
                         bounds.add(boundObject);

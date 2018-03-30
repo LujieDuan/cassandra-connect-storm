@@ -23,6 +23,13 @@ matrix:
         - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
         - mvn test -B
       after_script: cd ..
-      
+    # storm-kafka-consumer
+    - language: java
+      jdk: oraclejdk8
+      before_script: cd stormkafkaconsumer 
+      script:
+        - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        - mvn test -B
+      after_script: cd ..
 notifications:
   email: false

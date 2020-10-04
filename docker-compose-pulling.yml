@@ -57,7 +57,7 @@ services:
     restart: always
 
   nimbus:
-    image: storm
+    image: storm:1.2
     container_name: nimbus
     command: bash -c "(storm logviewer -c logviewer.port='8002' &) && (storm nimbus -c logviewer.port='8002')"
     depends_on:
@@ -72,7 +72,7 @@ services:
       - ./stormcassandrapulling/src/main/resources:/resources
 
   supervisor:
-    image: storm
+    image: storm:1.2
     container_name: supervisor
     command: bash -c "(storm logviewer -c logviewer.port='8003' &) && (storm supervisor -c logviewer.port='8003')"
     depends_on:
@@ -88,7 +88,7 @@ services:
       - ./stormcassandrapulling/src/main/resources:/resources
 
   stormui:
-    image: storm
+    image: storm:1.2
     container_name: stormmui
     command: storm ui
     depends_on:

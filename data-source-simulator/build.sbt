@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.5.11" % Test
 )
 
-libraryDependencies += "org.yaml" % "snakeyaml" % "1.20-SNAPSHOT"
+libraryDependencies += "org.yaml" % "snakeyaml" % "1.20"
 
 libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.7"
 

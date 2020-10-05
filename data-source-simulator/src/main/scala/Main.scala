@@ -21,7 +21,7 @@ object Main extends App {
   val yaml = new Yaml()
   val requirements : java.util.LinkedHashMap[String, util.ArrayList[java.util.LinkedHashMap[String, Object]]] =
     yaml.load(new FileInputStream(new File(filePath)))
-
+  println("Loaded configuration file..");
   // Spark
   val conf = new SparkConf(true)
     .set("spark.cassandra.connection.host", "cassandra-seed-node")
@@ -33,7 +33,7 @@ object Main extends App {
   implicit val sc : SparkContext = new SparkContext(conf)
 
   sc.setLogLevel("ERROR")
-
+  println("Set up Spark..")
   var index = 0
 
   for (keyspace <- requirements.get("keyspace").asScala) {
@@ -46,4 +46,5 @@ object Main extends App {
     index += 1
     keySpaceActor ! Start
   }
+  println("Created Actors...")
 }

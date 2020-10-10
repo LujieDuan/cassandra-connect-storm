@@ -24,6 +24,7 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.generated.StormTopology;
+import org.apache.storm.thrift.TException;
 
 public final class StormRunner {
 
@@ -34,10 +35,23 @@ public final class StormRunner {
 
   public static void runTopologyLocally(StormTopology topology, String topologyName, Config conf, int runtimeInSeconds)
       throws InterruptedException {
-    LocalCluster cluster = new LocalCluster();
-    cluster.submitTopology(topologyName, conf, topology);
+    LocalCluster cluster = null;
+    try {
+      cluster = new LocalCluster();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    try {
+      cluster.submitTopology(topologyName, conf, topology);
+    } catch (TException e) {
+      e.printStackTrace();
+    }
     Thread.sleep((long) runtimeInSeconds * MILLIS_IN_SEC);
-    cluster.killTopology(topologyName);
+    try {
+      cluster.killTopology(topologyName);
+    } catch (TException e) {
+      e.printStackTrace();
+    }
     cluster.shutdown();
   }
 

@@ -15,7 +15,7 @@ public class App {
         TopologyBuilder builder = new TopologyBuilder();
 
         // Build individual component
-        new PullingTopology(builder).build();
+        new BenchmarkTopology(builder).build();
 
         topologyConfig = createTopologyConfiguration();
 
